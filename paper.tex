@@ -1,0 +1,107 @@
+\documentclass[aip,jcp,12pt]{revtex4-1}
+
+\usepackage{amssymb}
+\usepackage{amsmath,amsfonts,amsthm}
+
+
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Title Begins
+\title{
+\textit{Grand Canonical Monte Carlo with Solvent Repacking: Phase Behavior of Size-asymmetrical Binary Lennard-Jones Fluids
+}}
+\author{Ziwei Guo}
+\address{Department of Chemistry, Emory University, Atlanta, Georgia 30322, USA}
+\author{James T. Kindt}
+\email{jkindt@emory.edu}
+\address{Department of Chemistry, Emory University, Atlanta, Georgia 30322, USA}
+\date{\today}
+
+\begin{abstract}
+Type abstract here
+\end{abstract}
+
+%\keywords{keyword1,keyword2,keyword3}
+
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Title Ends
+
+
+
+%%%%%%%%%%%%%%%%%%%%% Introduction
+\section{Introduction}
+
+%%%%%%%%%%%%%%%%%%%%% Methods
+\section{Methods}
+In this section, the acceptance probabilities of different types of MC moves will be derived. The method are also described in the paper of SRMC on hard disk mixtures\cite{kindt:2015}. We will start with moves in canonical ensembles where particle number N maintains constant, then proceed to the grand canonical ensembles of pure solvents where N are allowed to fluctuate with a fixed chemical potential. Finally, the acceptance probabilities of mixtures with two different size species in grand canonical ensembles will be derived.
+
+\subsection{Repacking at constant N}
+The first step of the SRMC moves is to define a "cavity" within the system. A set of particles within a certain cutoff from a randomly generated  position will be identified, which will be performed repacking moves later on. Defining the number of particles as $n_{cav}$, generation the new set of particles thereby needs $n_{cav}$ cycles. In each cycle i, a number of $k$ random positions  that uniformly sample the space of the "cavity" will be generated. For each position $j$ in these $k$ positions, their potential energy $u_{i,j}$ is calculated as the sum of the interaction with particles outside the cavity and the particles inserted in previous cycles. In each cycle, one of the $k$ positions is selected as the $i$th particle for the new trial set basing on the probabilty of choosing position $j'$,
+\begin{equation}
+P_{i,j'} = \frac{\exp(-\beta u_{i,j'})}{\sum\limits_{j=1}^k \exp(-\beta u_{i,j})}
+\end{equation}
+After selecting one as the $i$th particle in the new configuration set, we can proceed to the next cycles. After performing the same trial moves for current configurations, the probabilities $\alpha_{R\rightarrow R'}$ of generating a trial move between current configuration set $R$ and new configuration set $R'$ and its reverse  $\alpha_{R'\rightarrow R}$ can be calculated as
+\begin{equation}
+\frac{\alpha_{R'\rightarrow R}}{\alpha_{R\rightarrow R'}} = (\sum\limits_{i=1}^{n_{cav}}P_{i,j',current}) /  (\sum\limits_{i=1}^{n_{cav}}P_{i,j',new})
+\end{equation}
+According to the detailed balance, the acceptance probability can be derived
+\begin{equation}
+\label{eq:acc_consN}
+acc_{R\rightarrow R'} =\min[1,\frac{\alpha_{R'\rightarrow R}}{\alpha_{R\rightarrow R'}}\exp[-\beta (U_{R'})-(U_{R})]]
+\end{equation}
+
+Rosenbluth weight $W$ of the new or current configuration can be found
+\begin{equation}
+\label{eq:Rosenbluth}
+W = \prod\limits_{i=1}^{n_{cav}}\sum\limits_{j=1}^{k} \exp(-\beta u_{i,j})
+\end{equation}
+
+Therefore, We can rewrite Eq.(\ref{eq:acc_consN}) as
+\begin{equation}
+acc_{R\rightarrow R'} =\min(1,W_{new}/W_{current})
+\end{equation}
+
+\subsection{Grand canonical MC algorithm}
+In grand canonical ensemble simulations, the particle number $n_{cav}$ is allowed to fluctuate with a fixed chemical potential. Correspondingly, an additional factor $(f/\Lambda^d)^{\Delta N}$ reflecting the particle number difference should be incorporated in the probabilities  associated with the current and new configuration states. The $f=\exp(\beta \mu)$ in additional factor is the fugacity of the system, $\Lambda$  is the de Broglie thermal wavelength assigned to 1nm in all simulations, $d$ is the dimension of the system. The probabilities of particle addition trial move between current and new configuration sets and its reverse in grand canonical can be calculated as
+\begin{equation}
+\frac{\alpha_{R',N+1\rightarrow R,N}}{\alpha_{R,N\rightarrow R',N+1}} = (\frac{n_{cav}!}{v_{cav}^{n_{cav}}}  \prod\limits_{i=1}^{n_{cav}} k_i P_{i,j',current}) / (\frac{(n_{cav}+1)!}{v_{cav}^{n_{cav}+1}}  \prod\limits_{i=1}^{n_{cav}+1} k_i P_{i,j',new})
+\end{equation}
+After including the additional factor and substituting the Rosenbluth weight Eq.(\ref{eq:Rosenbluth}), the  acceptance probability of adding one particles can be written as 
+\begin{equation}
+\label{eq:ordinaryGrandAcc}
+acc_{R,N\rightarrow R',N+1} = \min[1,\frac{f}{\Lambda^d} \frac{v_{cav}}{(n_{cav}+1)k_{n_{cav}+1}} \frac{W_{new}}{W_{current}}]
+\end{equation}
+In our SRMC trial moves, $\Delta N$ could be larger than one in particle addition trials (or smaller than -1 in removal trials). We first generate particles as much as we can. When the sum of the Boltzmann weight for $j$th cycles is smaller than a pre-assigned value, the trial insertion stops and we get $n_{max}$ particles in cavity. A choice may be made to use a subset $i'\in {0,n_{max}}$
+\begin{equation}
+P(i')=\frac{\omega_{i'}}{\sum\limits_{i=0}^{n_{max}}\omega_i}
+\end{equation}
+to determine how many particles to be actually insert into the cavity. The $\omega_i$ in the above probability is a weight associated with the state containing a specific number i of particles in cavity go along with the probability of generating these i particles
+\begin{equation}
+\omega_i = \frac{f^i}{\Lambda^{di}} \frac{v_{cav}^i}{i!\prod\limits_{i'=1}^i k_{i'}} W_i
+\end{equation}
+Therefore, the overall acceptance probability of trial moves between current and new states containing different number of particles can be calculated as 
+\begin{equation}
+\label{eq:SRMCgrandAcc}
+acc_{n_{cav}\rightarrow n_{cav'}} = \min[1,{\sum\limits_{i=0}^{n_{max,new}} \omega_{i,new}} / {\sum\limits_{i=0}^{n_{max,current}} \omega_{i,current}}]
+\end{equation}
+and it is consistent with the acceptance probability of ordinary grand canonical MC moves Eq.(\ref{eq:ordinaryGrandAcc}), where only one particle addition or removal is allowed in one trial move. 
+
+\subsection{GCMC for mixtures}
+SRMC can also be used to study a binary mixture of small and large particles.  In our simulation, the cutoff of the cavity is tuned so that only one large particles is involved in insertion or removal trial moves. For large particle insertion moves, the probability of inserting a particle in simulation box is simply $1/V$, where $V$ is the volume of simulation box. The probability of generating the current small particles occupying  the cavity can be calculate by using the same method when derive Eq.(\ref{eq:SRMCgrandAcc}). 
+
+
+%%%%%%%%%%%%%%%%%%%%% Results and Discussion
+\section{Results and Discussion}
+
+
+%%%%%%%%%%%%%%%%%%%%% Conclusions
+\section{Conclusions}
+
+
+
+
+\bibliography{ref}
+
+\end{document}
