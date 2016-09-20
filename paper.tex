@@ -89,15 +89,29 @@ acc_{n_{cav}\rightarrow n_{cav'}} = \min[1,{\sum\limits_{i=0}^{n_{max,new}} \ome
 and it is consistent with the acceptance probability of ordinary grand canonical MC moves Eq.(\ref{eq:ordinaryGrandAcc}), where only one particle addition or removal is allowed in one trial move. 
 
 \subsection{GCMC for mixtures}
-SRMC can also be used to study a binary mixture of small and large particles.  In our simulation, the cutoff of the cavity is tuned so that only one large particles is involved in insertion or removal trial moves. For large particle insertion moves, the probability of inserting a particle in simulation box is simply $1/V$, where $V$ is the volume of simulation box. The probability of generating the current small particles occupying  the cavity can be calculate by using the same method when derive Eq.(\ref{eq:SRMCgrandAcc}). 
+SRMC can also be used to study a binary mixture of small and large particles.  In our simulation, the cutoff of the cavity is tuned so that only one large particles is involved in insertion or removal trial moves. For large particle insertion moves, the probability of inserting a particle in simulation box is simply $1/V$, where $V$ is the volume of simulation box. The probability of generating the current small particles occupying  the cavity can be calculate by using the same method when derive Eq.(\ref{eq:SRMCgrandAcc}). Therefore, the probabilities ratio of large particle insertion move and its reverse can be obtained as 
+\begin{equation}
+\frac{\alpha_{N_s-n_{cav},N_L+1\rightarrow N_s,N_L}}{\alpha_{N_s,N_L\rightarrow N_s-n_{cav},N_L+1}} = (\frac{1}{N_L+1} \frac{\omega_{n_{cav,current}}}{\sum\limits_{i=0}^{n_{max,current}}\omega_{i,current}} \frac{n_{cav}!}{v_{cav}^{n_{cav}}}  \prod\limits_{i=1}^{n_{cav}} k_i P_{i,j',current})/V^{-1}
+\end{equation}
+Incorporated with the additional factor $(f/\Lambda^d)^{\Delta N}$, the acceptance probabilities for binary mixtures can be derived as
+\begin{equation}
+acc_{N_s,N_L\rightarrow N_s-n_{cav},N_L+1} = \min[1,\frac{V}{N_L+1} \frac{f_L}{\Lambda_L^d} \frac{\exp(-\beta u_L)}{\sum\limits_{i=0}^{n_{max,current}}\omega_{i,current}}]
+\end{equation}
+where $u_L$ is the interaction between inserted large particle and all particles outside cavity and $f_L$ is the fugacity of large particle.
 
 
 %%%%%%%%%%%%%%%%%%%%% Results and Discussion
 \section{Results and Discussion}
+In this section, the vapor-liquid phase transition of one component LJ fluid is demonstrated and compared with others' results to validate the SRMC method. Then, the SRMC results of applications to binary mixtures under different ratios of $\epsilon$ will be described. Finally, discussions are made on the structure of the binary mixtures obtained from simulations.
+\subsection{Phase diagram of one component system}
+\subsection{Phase diagram of binary mixtures}
+\subsection{Structure analysis of binary mixtures}
 
 
 %%%%%%%%%%%%%%%%%%%%% Conclusions
 \section{Conclusions}
+
+
 
 
 
